@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'edit_profile.dart'; // Pastikan path sesuai
+import 'edit_profile.dart';
 import 'todo_form.dart';
 import 'todo_card.dart';
 
@@ -20,78 +20,95 @@ class HalamanUtama extends StatefulWidget {
 }
 
 class _HalamanUtamaState extends State<HalamanUtama> {
-  String get userId => FirebaseAuth.instance.currentUser!.uid;
+  String? get userId => FirebaseAuth.instance.currentUser?.uid;
 
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF24243e),
-        title: const Text(
-          'Konfirmasi Logout',
-          style: TextStyle(color: Colors.cyanAccent),
-        ),
-        content: const Text(
-          'Apakah Anda yakin ingin keluar?',
-          style: TextStyle(color: Colors.white),
-        ),
-        actions: [
-          TextButton(
-            child: const Text('Batal', style: TextStyle(color: Colors.cyanAccent)),
-            onPressed: () => Navigator.of(context).pop(),
+      builder:
+          (ctx) => AlertDialog(
+            backgroundColor: const Color(0xFF24243e),
+            title: const Text(
+              'Konfirmasi Logout',
+              style: TextStyle(color: Colors.cyanAccent),
+            ),
+            content: const Text(
+              'Apakah Anda yakin ingin keluar?',
+              style: TextStyle(color: Colors.white),
+            ),
+            actions: [
+              TextButton(
+                child: const Text(
+                  'Batal',
+                  style: TextStyle(color: Colors.cyanAccent),
+                ),
+                onPressed: () => Navigator.of(ctx).pop(),
+              ),
+              TextButton(
+                child: const Text(
+                  'Logout',
+                  style: TextStyle(color: Colors.pinkAccent),
+                ),
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.of(ctx).pop(); // Tutup dialog
+                  if (mounted) {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  }
+                  // AuthWrapper akan otomatis redirect ke login
+                },
+              ),
+            ],
           ),
-          TextButton(
-            child: const Text('Logout', style: TextStyle(color: Colors.pinkAccent)),
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-              Navigator.of(context).pop();
-              Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
-            },
-          ),
-        ],
-      ),
     );
   }
 
-  void _showTodoForm({String? docId, DateTime? initialDate, String? initialNama, String? initialDeskripsi}) {
+  void _showTodoForm({
+    String? docId,
+    DateTime? initialDate,
+    String? initialNama,
+    String? initialDeskripsi,
+  }) {
     showDialog(
       context: context,
-      builder: (context) => TodoForm(
-        initialDate: initialDate,
-        initialNama: initialNama,
-        initialDeskripsi: initialDeskripsi,
-        onSubmit: (tanggal, nama, deskripsi) async {
-          final tanggalStr = "${tanggal.year}-${tanggal.month.toString().padLeft(2, '0')}-${tanggal.day.toString().padLeft(2, '0')}";
-          if (docId == null) {
-            // Create
-            await FirebaseFirestore.instance
-                .collection('users')
-                .doc(userId)
-                .collection('todos')
-                .add({
-              'tanggal': tanggalStr,
-              'namaKegiatan': nama,
-              'deskripsi': deskripsi,
-              'isDone': false,
-              'createdAt': FieldValue.serverTimestamp(),
-              'updatedAt': FieldValue.serverTimestamp(),
-            });
-          } else {
-            // Update
-            await FirebaseFirestore.instance
-                .collection('users')
-                .doc(userId)
-                .collection('todos')
-                .doc(docId)
-                .update({
-              'tanggal': tanggalStr,
-              'namaKegiatan': nama,
-              'deskripsi': deskripsi,
-              'updatedAt': FieldValue.serverTimestamp(),
-            });
-          }
-        },
-      ),
+      builder:
+          (context) => TodoForm(
+            initialDate: initialDate,
+            initialNama: initialNama,
+            initialDeskripsi: initialDeskripsi,
+            onSubmit: (tanggal, nama, deskripsi) async {
+              final tanggalStr =
+                  "${tanggal.year}-${tanggal.month.toString().padLeft(2, '0')}-${tanggal.day.toString().padLeft(2, '0')}";
+              if (docId == null) {
+                // Create
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(userId)
+                    .collection('todos')
+                    .add({
+                      'tanggal': tanggalStr,
+                      'namaKegiatan': nama,
+                      'deskripsi': deskripsi,
+                      'isDone': false,
+                      'createdAt': FieldValue.serverTimestamp(),
+                      'updatedAt': FieldValue.serverTimestamp(),
+                    });
+              } else {
+                // Update
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(userId)
+                    .collection('todos')
+                    .doc(docId)
+                    .update({
+                      'tanggal': tanggalStr,
+                      'namaKegiatan': nama,
+                      'deskripsi': deskripsi,
+                      'updatedAt': FieldValue.serverTimestamp(),
+                    });
+              }
+            },
+          ),
     );
   }
 
@@ -120,11 +137,7 @@ class _HalamanUtamaState extends State<HalamanUtama> {
         child: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                Color(0xFF0f0c29),
-                Color(0xFF302b63),
-                Color(0xFF24243e),
-              ],
+              colors: [Color(0xFF0f0c29), Color(0xFF302b63), Color(0xFF24243e)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -133,9 +146,7 @@ class _HalamanUtamaState extends State<HalamanUtama> {
             padding: EdgeInsets.zero,
             children: [
               DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                ),
+                decoration: BoxDecoration(color: Colors.black.withOpacity(0.6)),
                 child: Row(
                   children: [
                     CircleAvatar(
@@ -183,18 +194,6 @@ class _HalamanUtamaState extends State<HalamanUtama> {
                 ),
                 onTap: () {
                   Navigator.pop(context); // Menutup drawer
-                  // Jika sudah di halaman utama, cukup tutup drawer saja
-                  // Jika ingin navigasi dari halaman lain, bisa gunakan pushReplacement ke HalamanUtama
-                  // Contoh:
-                  // Navigator.pushReplacement(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => HalamanUtama(
-                  //       namaLengkap: widget.namaLengkap,
-                  //       mottoHidup: widget.mottoHidup,
-                  //     ),
-                  //   ),
-                  // );
                 },
               ),
               ListTile(
@@ -207,10 +206,11 @@ class _HalamanUtamaState extends State<HalamanUtama> {
                   final result = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => EditProfilePage(
-                        namaAwal: widget.namaLengkap,
-                        mottoAwal: widget.mottoHidup,
-                      ),
+                      builder:
+                          (ctx) => EditProfilePage(
+                            namaAwal: widget.namaLengkap,
+                            mottoAwal: widget.mottoHidup,
+                          ),
                     ),
                   );
                   if (result != null && result is Map) {
@@ -218,10 +218,11 @@ class _HalamanUtamaState extends State<HalamanUtama> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => HalamanUtama(
-                          namaLengkap: result['namaLengkap'],
-                          mottoHidup: result['mottoHidup'],
-                        ),
+                        builder:
+                            (ctx) => HalamanUtama(
+                              namaLengkap: result['namaLengkap'],
+                              mottoHidup: result['mottoHidup'],
+                            ),
                       ),
                     );
                   }
@@ -233,7 +234,9 @@ class _HalamanUtamaState extends State<HalamanUtama> {
                   'Logout',
                   style: TextStyle(color: Colors.white),
                 ),
-                onTap: () => _showLogoutDialog(context),
+                onTap: () {
+                  _showLogoutDialog(context);
+                },
               ),
             ],
           ),
@@ -267,25 +270,34 @@ class _HalamanUtamaState extends State<HalamanUtama> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFF0f0c29),
-              Color(0xFF302b63),
-              Color(0xFF24243e),
-            ],
+            colors: [Color(0xFF0f0c29), Color(0xFF302b63), Color(0xFF24243e)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
         child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('users')
-              .doc(userId)
-              .collection('todos')
-              .orderBy('tanggal')
-              .snapshots(),
+          stream:
+              userId == null
+                  ? null
+                  : FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(userId)
+                      .collection('todos')
+                      .orderBy('tanggal')
+                      .snapshots(),
           builder: (context, snapshot) {
+            if (userId == null) {
+              return const Center(
+                child: Text(
+                  'Silakan login ulang.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              );
+            }
             if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator(color: Colors.cyanAccent));
+              return const Center(
+                child: CircularProgressIndicator(color: Colors.cyanAccent),
+              );
             }
             final docs = snapshot.data!.docs;
             // Group by tanggal
@@ -305,53 +317,60 @@ class _HalamanUtamaState extends State<HalamanUtama> {
             }
             return ListView(
               padding: const EdgeInsets.all(16),
-              children: grouped.entries.map((entry) {
-                final tanggal = entry.key;
-                final kegiatanList = entry.value;
-                return Card(
-                  color: Colors.black.withOpacity(0.7),
-                  margin: const EdgeInsets.only(bottom: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: Colors.cyanAccent.withOpacity(0.5), width: 2),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Tanggal: $tanggal',
-                          style: const TextStyle(
-                            color: Colors.cyanAccent,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
+              children:
+                  grouped.entries.map((entry) {
+                    final tanggal = entry.key;
+                    final kegiatanList = entry.value;
+                    return Card(
+                      color: Colors.black.withOpacity(0.7),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: BorderSide(
+                          color: Colors.cyanAccent.withOpacity(0.5),
+                          width: 2,
                         ),
-                        const SizedBox(height: 8),
-                        ...kegiatanList.map((doc) {
-                          final nama = doc['namaKegiatan'] ?? '';
-                          final deskripsi = doc['deskripsi'] ?? '';
-                          final isDone = doc['isDone'] ?? false;
-                          return TodoCard(
-                            nama: nama,
-                            deskripsi: deskripsi,
-                            isDone: isDone,
-                            onToggleDone: () => _toggleDone(doc.id, isDone),
-                            onEdit: () => _showTodoForm(
-                              docId: doc.id,
-                              initialDate: DateTime.parse(doc['tanggal']),
-                              initialNama: nama,
-                              initialDeskripsi: deskripsi,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Tanggal: $tanggal',
+                              style: const TextStyle(
+                                color: Colors.cyanAccent,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
                             ),
-                            onDelete: () => _deleteKegiatan(doc.id),
-                          );
-                        }).toList(),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
+                            const SizedBox(height: 8),
+                            ...kegiatanList.map((doc) {
+                              final nama = doc['namaKegiatan'] ?? '';
+                              final deskripsi = doc['deskripsi'] ?? '';
+                              final isDone = doc['isDone'] ?? false;
+                              return TodoCard(
+                                nama: nama,
+                                deskripsi: deskripsi,
+                                isDone: isDone,
+                                onToggleDone: () => _toggleDone(doc.id, isDone),
+                                onEdit:
+                                    () => _showTodoForm(
+                                      docId: doc.id,
+                                      initialDate: DateTime.parse(
+                                        doc['tanggal'],
+                                      ),
+                                      initialNama: nama,
+                                      initialDeskripsi: deskripsi,
+                                    ),
+                                onDelete: () => _deleteKegiatan(doc.id),
+                              );
+                            }).toList(),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
             );
           },
         ),
