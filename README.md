@@ -1,20 +1,34 @@
-<<<<<<< HEAD
-# to_do_dino
+# 🦕 To Do Dino
 
-A new Flutter project.
+Aplikasi To Do List modern dengan tema cyberpunk, dibuat menggunakan Flutter & Firebase.  
+Kelola aktivitas harianmu dengan mudah, cepat, dan penuh warna!
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## ✨ Fitur Unggulan
 
-A few resources to get you started if this is your first Flutter project:
+- **CRUD Kegiatan:** Tambah, edit, centang, dan hapus kegiatan harian.
+- **Grouping Otomatis:** Kegiatan otomatis dikelompokkan berdasarkan tanggal.
+- **Edit Profil:** Ubah nama & motto hidup langsung dari aplikasi.
+- **Session Aman:** Tidak perlu login ulang selama belum logout.
+- **Konfirmasi Logout:** Dialog konfirmasi sebelum keluar dari akun.
+- **Tampilan Cyberpunk:** UI dengan gradasi warna neon yang keren.
+- **Realtime Sync:** Data tersimpan dan terupdate otomatis di Firebase Cloud Firestore.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-=======
-# to-do-mobile
->>>>>>> 84093cc3fbc437227636782a0b019af9161064eb
+## 📱 Tampilan
+
+|              Halaman Utama               |             Tambah Kegiatan             |                 Edit Profil                 |
+| :--------------------------------------: | :-------------------------------------: | :-----------------------------------------: |
+| ![main](https://i.imgur.com/0y0y0y0.png) | ![add](https://i.imgur.com/1x1x1x1.png) | ![profile](https://i.imgur.com/2z2z2z2.png) |
+
+---
+
+## 🚀 Cara Menjalankan
+
+1. **Clone repository ini**
+   ```sh
+   git clone https://github.com/username/to-do-dino.git
+   cd to-do-dino
+   ```
